@@ -12,6 +12,10 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -40,6 +44,10 @@ final class BinanceHttpClientTest extends TestCase
         );
 
         $this->binanceHttpClient->setLogger($this->createMock(LoggerInterface::class));
+        $this->binanceHttpClient->setSerializer(new Serializer(
+            [new ObjectNormalizer(propertyTypeExtractor: new ReflectionExtractor())],
+            [new JsonEncoder()],
+        ));
     }
 
     protected function tearDown(): void

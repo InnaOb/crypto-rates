@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace CryptoRate\NetworkLayer\DTO\Request\Rate;
 
+use CryptoRate\NetworkLayer\DTO\Request\RequestDtoInterface;
 use CryptoRate\Tool\Enum\Crypto\CurrencyPairEnum;
 use CryptoRate\Tool\Enum\Validation\ValidationMessageEnum;
 use CryptoRate\Tool\Helper\StringHelper;
 use DateTimeImmutable;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final readonly class DayRateRequest
+final readonly class DayRateRequest implements RequestDtoInterface
 {
     public function __construct(
         #[Assert\NotBlank(message: ValidationMessageEnum::NOT_BLANK->value)]

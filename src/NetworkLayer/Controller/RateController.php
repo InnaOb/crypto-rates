@@ -13,7 +13,6 @@ use CryptoRate\ServiceLayer\Provider\CryptoRate\CryptoRateProviderInterface;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/api/rates')]
@@ -52,12 +51,9 @@ final class RateController extends AbstractCustomController
             ),
         ]
     )]
-    public function last24h(Request $request): JsonResponse
+    public function last24h(Last24hRequest $last24hRequest): JsonResponse
     {
-        $last24Request = Last24hRequest::fromQuery($request->query->all());
-        $this->validateAndThrow($last24Request);
-
-        $rates = $this->cryptoRateProvider->getLast24h($last24Request->getPairEnum());
+        $rates = $this->cryptoRateProvider->getLast24h($last24hRequest->getPairEnum());
 
         return $this->successResponse($this->ratesResponseFactory->fromRates($rates));
     }
@@ -91,12 +87,9 @@ final class RateController extends AbstractCustomController
             ),
         ]
     )]
-    public function day(Request $request): JsonResponse
+    public function day(DayRateRequest $dayRateRequest): JsonResponse
     {
-        $dateRateRequest = DayRateRequest::fromQuery($request->query->all());
-        $this->validateAndThrow($dateRateRequest);
-
-        $rates = $this->cryptoRateProvider->getByDay($dateRateRequest->getPairEnum(), $dateRateRequest->getDateAsImmutable());
+        $rates = $this->cryptoRateProvider->getByDay($dayRateRequest->getPairEnum(), $dayRateRequest->getDateAsImmutable());
 
         return $this->successResponse($this->ratesResponseFactory->fromRates($rates));
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CryptoRate\ServiceLayer\Provider\CryptoRate;
 
-use CryptoRate\DataLayer\Entity\CryptoRate;
+use CryptoRate\DataLayer\Collection\CryptoRateCollection;
 use CryptoRate\Tool\Enum\Crypto\CurrencyPairEnum;
 use DateTimeImmutable;
 
@@ -12,13 +12,7 @@ interface CryptoRateProviderInterface
 {
     public function fetchAndSaveAll(): void;
 
-    /**
-     * @return CryptoRate[]
-     */
-    public function getLast24h(CurrencyPairEnum $pair): array;
+    public function getLast24h(CurrencyPairEnum $pair): CryptoRateCollection;
 
-    /**
-     * @return CryptoRate[]
-     */
-    public function getByDay(CurrencyPairEnum $pair, DateTimeImmutable $date): array;
+    public function getByDay(CurrencyPairEnum $pair, DateTimeImmutable $date): CryptoRateCollection;
 }

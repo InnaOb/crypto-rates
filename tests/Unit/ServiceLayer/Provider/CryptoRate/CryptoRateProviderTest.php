@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CryptoRate\Tests\Unit\ServiceLayer\Provider\CryptoRate;
 
+use CryptoRate\DataLayer\Collection\CryptoRateCollection;
 use CryptoRate\DataLayer\Entity\CryptoRate;
 use CryptoRate\DataLayer\Http\Binance\BinanceHttpClientInterface;
 use CryptoRate\DataLayer\Repository\CryptoRateRepositoryInterface;
@@ -89,10 +90,8 @@ final class CryptoRateProviderTest extends TestCase
 
     /**
      * @dataProvider \CryptoRate\Tests\DataProvider\Unit\ServiceLayer\Provider\CryptoRate\CryptoRateProviderDataProvider::providerGetLast24h
-     *
-     * @param CryptoRate[] $expected
      */
-    public function testGetLast24h(CurrencyPairEnum $pair, array $expected): void
+    public function testGetLast24h(CurrencyPairEnum $pair, CryptoRateCollection $expected): void
     {
         $this->cryptoRateRepositoryMock
             ->expects($this->once())
@@ -107,10 +106,8 @@ final class CryptoRateProviderTest extends TestCase
 
     /**
      * @dataProvider \CryptoRate\Tests\DataProvider\Unit\ServiceLayer\Provider\CryptoRate\CryptoRateProviderDataProvider::providerGetByDay
-     *
-     * @param CryptoRate[] $expected
      */
-    public function testGetByDay(CurrencyPairEnum $pair, DateTimeImmutable $date, array $expected): void
+    public function testGetByDay(CurrencyPairEnum $pair, DateTimeImmutable $date, CryptoRateCollection $expected): void
     {
         $this->cryptoRateRepositoryMock
             ->expects($this->once())

@@ -46,7 +46,7 @@ final class BaseRequestOption
         return $this->httpOptions->toArray();
     }
 
-    public function getHttpOptionRequest(): mixed
+    public function getHttpOptionRequest(): array|string|null
     {
         $options = $this->httpOptions->toArray();
 

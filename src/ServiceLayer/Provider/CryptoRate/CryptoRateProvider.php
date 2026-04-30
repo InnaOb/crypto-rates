@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CryptoRate\ServiceLayer\Provider\CryptoRate;
 
+use CryptoRate\DataLayer\Collection\CryptoRateCollection;
 use CryptoRate\DataLayer\Entity\CryptoRate;
 use CryptoRate\DataLayer\Http\Binance\BinanceHttpClientInterface;
 use CryptoRate\DataLayer\Repository\CryptoRateRepositoryInterface;
@@ -39,18 +40,12 @@ final class CryptoRateProvider implements CryptoRateProviderInterface
         $this->logFinished(ModuleContextEnum::SCHEDULER);
     }
 
-    /**
-     * @return CryptoRate[]
-     */
-    public function getLast24h(CurrencyPairEnum $pair): array
+    public function getLast24h(CurrencyPairEnum $pair): CryptoRateCollection
     {
         return $this->cryptoRateRepository->findLast24h($pair->toStorageKey());
     }
 
-    /**
-     * @return CryptoRate[]
-     */
-    public function getByDay(CurrencyPairEnum $pair, DateTimeImmutable $date): array
+    public function getByDay(CurrencyPairEnum $pair, DateTimeImmutable $date): CryptoRateCollection
     {
         return $this->cryptoRateRepository->findByDay($pair->toStorageKey(), $date);
     }

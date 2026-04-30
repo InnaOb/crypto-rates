@@ -6,11 +6,16 @@ namespace CryptoRate\DataLayer\Http\Binance;
 
 use CryptoRate\DataLayer\Http\BaseHttpClient;
 use CryptoRate\DataLayer\Object\HttpClient\Request\BaseRequestOption;
+use CryptoRate\DataLayer\Object\HttpClient\Response\Binance\BinancePriceResponse;
 use CryptoRate\FrameworkLayer\Exception\ServiceUnavailableCustomException;
+use CryptoRate\Tool\Util\SerializerAwareTrait;
+use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class BinanceHttpClient extends BaseHttpClient implements BinanceHttpClientInterface
 {
+    use SerializerAwareTrait;
+
     private const PRICE_TICKER_PATH = '/api/v3/ticker/price';
     private const HTTP_CLIENT_NAME = 'BINANCE_HTTP_CLIENT';
 
@@ -31,14 +36,19 @@ final class BinanceHttpClient extends BaseHttpClient implements BinanceHttpClien
 
         $this->sendRequest($requestOption);
 
-        $decoded = json_decode($this->getResponseContent(), true);
+        try {
+            $response = $this->serializer->deserialize(
+                $this->getResponseContent(),
+                BinancePriceResponse::class,
+                'json',
+            );
 
-        if (!isset($decoded['price'])) {
+            return $response->price;
+        } catch (SerializerExceptionInterface $e) {
             throw new ServiceUnavailableCustomException(
                 message: sprintf('[%s] Unexpected response format for symbol %s', self::HTTP_CLIENT_NAME, $symbol),
+                previous: $e,
             );
         }
-
-        return $decoded['price'];
     }
 }

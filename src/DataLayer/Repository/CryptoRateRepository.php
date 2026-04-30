@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CryptoRate\DataLayer\Repository;
 
+use CryptoRate\DataLayer\Collection\CryptoRateCollection;
 use CryptoRate\DataLayer\Entity\CryptoRate;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -22,34 +23,32 @@ class CryptoRateRepository extends ServiceEntityRepository implements CryptoRate
         $this->getEntityManager()->flush();
     }
 
-    /**
-     * @return CryptoRate[]
-     */
-    public function findLast24h(string $pair): array
+    public function findLast24h(string $pair): CryptoRateCollection
     {
-        return $this->createQueryBuilder('cr')
-            ->where('cr.pair = :pair')
-            ->andWhere('cr.recordedAt >= :from')
-            ->setParameter('pair', $pair)
-            ->setParameter('from', new DateTimeImmutable('-24 hours'))
-            ->orderBy('cr.recordedAt', 'ASC')
-            ->getQuery()
-            ->getResult();
+        return CryptoRateCollection::fromEntities(
+            $this->createQueryBuilder('cr')
+                ->where('cr.pair = :pair')
+                ->andWhere('cr.recordedAt >= :from')
+                ->setParameter('pair', $pair)
+                ->setParameter('from', new DateTimeImmutable('-24 hours'))
+                ->orderBy('cr.recordedAt', 'ASC')
+                ->getQuery()
+                ->getResult()
+        );
     }
 
-    /**
-     * @return CryptoRate[]
-     */
-    public function findByDay(string $pair, DateTimeImmutable $date): array
+    public function findByDay(string $pair, DateTimeImmutable $date): CryptoRateCollection
     {
-        return $this->createQueryBuilder('cr')
-            ->where('cr.pair = :pair')
-            ->andWhere('cr.recordedAt >= :from AND cr.recordedAt < :to')
-            ->setParameter('pair', $pair)
-            ->setParameter('from', $date->setTime(0, 0, 0))
-            ->setParameter('to', $date->modify('+1 day')->setTime(0, 0, 0))
-            ->orderBy('cr.recordedAt', 'ASC')
-            ->getQuery()
-            ->getResult();
+        return CryptoRateCollection::fromEntities(
+            $this->createQueryBuilder('cr')
+                ->where('cr.pair = :pair')
+                ->andWhere('cr.recordedAt >= :from AND cr.recordedAt < :to')
+                ->setParameter('pair', $pair)
+                ->setParameter('from', $date->setTime(0, 0, 0))
+                ->setParameter('to', $date->modify('+1 day')->setTime(0, 0, 0))
+                ->orderBy('cr.recordedAt', 'ASC')
+                ->getQuery()
+                ->getResult()
+        );
     }
 }
