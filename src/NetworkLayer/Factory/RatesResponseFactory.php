@@ -16,7 +16,11 @@ final class RatesResponseFactory
     {
         return new RatesResponse(
             RatesData::fromItems(
-                $rates->map(static fn(CryptoRate $rate) => RateItemResponse::fromEntity($rate))
+                $rates->map(static fn(CryptoRate $rate) => new RateItemResponse(
+                    pair: $rate->getPair(),
+                    rate: $rate->getRate(),
+                    recordedAt: $rate->getRecordedAt()->format(\DateTimeInterface::ATOM),
+                ))
             )
         );
     }

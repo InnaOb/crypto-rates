@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace CryptoRate\NetworkLayer\DTO\Response\Rate;
 
-use CryptoRate\DataLayer\Entity\CryptoRate;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 
@@ -39,12 +38,4 @@ final readonly class RateItemResponse
         return $this->recordedAt;
     }
 
-    public static function fromEntity(CryptoRate $cryptoRate): self
-    {
-        return new self(
-            pair: $cryptoRate->getPair(),
-            rate: $cryptoRate->getRate(),
-            recordedAt: $cryptoRate->getRecordedAt()->format(\DateTimeInterface::ATOM),
-        );
-    }
 }
