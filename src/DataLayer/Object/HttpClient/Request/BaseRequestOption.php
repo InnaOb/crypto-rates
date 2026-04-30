@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CryptoRate\DataLayer\Object\HttpClient\Request;
 
 use CryptoRate\Tool\Enum\Http\RequestMethodEnum;
+use CryptoRate\Tool\Helper\StringHelper;
 use Symfony\Component\HttpClient\HttpOptions;
 
 final class BaseRequestOption
@@ -46,11 +47,24 @@ final class BaseRequestOption
         return $this->httpOptions->toArray();
     }
 
-    public function getHttpOptionRequest(): array|string|null
+    public function getRequestBodyAsString(): string
     {
         $options = $this->httpOptions->toArray();
+        $body = $options['query'] ?? $options['body'] ?? null;
 
-        return $options['query'] ?? $options['body'] ?? null;
+        if (null === $body) {
+            return StringHelper::EMPTY_STRING;
+        }
+
+        if (is_string($body)) {
+            return $body;
+        }
+
+        try {
+            return json_encode($body, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return StringHelper::EMPTY_STRING;
+        }
     }
 
     public static function toGetRequestOption(

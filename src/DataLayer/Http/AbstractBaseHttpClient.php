@@ -6,7 +6,6 @@ namespace CryptoRate\DataLayer\Http;
 
 use CryptoRate\DataLayer\Object\HttpClient\Request\BaseRequestOption;
 use CryptoRate\FrameworkLayer\Exception\ServiceUnavailableCustomException;
-use CryptoRate\Tool\Helper\StringHelper;
 use CryptoRate\Tool\Util\LoggerAwareTrait;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\ServerException;
@@ -86,20 +85,6 @@ abstract class AbstractBaseHttpClient
 
     private function getRequestBodyString(BaseRequestOption $requestOption): string
     {
-        $body = $requestOption->getHttpOptionRequest();
-
-        if (null === $body) {
-            return StringHelper::EMPTY_STRING;
-        }
-
-        if (is_string($body)) {
-            return $body;
-        }
-
-        try {
-            return json_encode($body, JSON_THROW_ON_ERROR);
-        } catch (\JsonException) {
-            return StringHelper::EMPTY_STRING;
-        }
+        return $requestOption->getRequestBodyAsString();
     }
 }
