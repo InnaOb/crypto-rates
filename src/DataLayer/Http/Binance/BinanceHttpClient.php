@@ -8,6 +8,7 @@ use CryptoRate\DataLayer\Http\BaseHttpClient;
 use CryptoRate\DataLayer\Object\HttpClient\Request\BaseRequestOption;
 use CryptoRate\DataLayer\Object\HttpClient\Response\Binance\BinancePriceResponse;
 use CryptoRate\FrameworkLayer\Exception\ServiceUnavailableCustomException;
+use CryptoRate\Tool\Enum\Monolog\ModuleContextEnum;
 use CryptoRate\Tool\Util\SerializerAwareTrait;
 use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -17,13 +18,12 @@ final class BinanceHttpClient extends BaseHttpClient implements BinanceHttpClien
     use SerializerAwareTrait;
 
     private const PRICE_TICKER_PATH = '/api/v3/ticker/price';
-    private const HTTP_CLIENT_NAME = 'BINANCE_HTTP_CLIENT';
 
     public function __construct(
         HttpClientInterface $binanceHttpClient,
         private readonly string $binanceBaseUri,
     ) {
-        parent::__construct($binanceHttpClient, self::HTTP_CLIENT_NAME);
+        parent::__construct($binanceHttpClient, ModuleContextEnum::BINANCE_HTTP_CLIENT->value);
     }
 
     public function getPrice(string $symbol): string
@@ -46,7 +46,7 @@ final class BinanceHttpClient extends BaseHttpClient implements BinanceHttpClien
             return $response->price;
         } catch (SerializerExceptionInterface $e) {
             throw new ServiceUnavailableCustomException(
-                message: sprintf('[%s] Unexpected response format for symbol %s', self::HTTP_CLIENT_NAME, $symbol),
+                message: sprintf('[%s] Unexpected response format for symbol %s', ModuleContextEnum::BINANCE_HTTP_CLIENT->value, $symbol),
                 previous: $e,
             );
         }

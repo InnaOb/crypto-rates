@@ -18,7 +18,6 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
-use Throwable;
 
 abstract class AbstractBaseHttpClient
 {
@@ -26,7 +25,7 @@ abstract class AbstractBaseHttpClient
 
     public function __construct(
         protected readonly HttpClientInterface $httpClient,
-        protected readonly string $httpClientName = 'BASE_HTTP_CLIENT',
+        protected readonly string $httpClientName,
     ) {
     }
 
@@ -99,7 +98,7 @@ abstract class AbstractBaseHttpClient
 
         try {
             return json_encode($body, JSON_THROW_ON_ERROR);
-        } catch (Throwable) {
+        } catch (\JsonException) {
             return StringHelper::EMPTY_STRING;
         }
     }
