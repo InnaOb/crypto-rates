@@ -24,6 +24,14 @@ enum CurrencyPairEnum: string
         return $this->value;
     }
 
+    /**
+     * @return string[]
+     */
+    public static function values(): array
+    {
+        return array_map(static fn(self $case) => $case->value, self::cases());
+    }
+
     public static function fromBinanceSymbol(string $symbol): self
     {
         return match($symbol) {

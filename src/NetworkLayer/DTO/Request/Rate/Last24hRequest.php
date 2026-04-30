@@ -15,7 +15,7 @@ final readonly class Last24hRequest implements RequestDtoInterface
     public function __construct(
         #[Assert\NotBlank(message: ValidationMessageEnum::NOT_BLANK->value)]
         #[Assert\Choice(
-            choices: ['EUR/BTC', 'EUR/ETH', 'EUR/LTC'],
+            callback: [CurrencyPairEnum::class, 'values'],
             message: ValidationMessageEnum::INVALID_PAIR->value,
         )]
         public string $pair,

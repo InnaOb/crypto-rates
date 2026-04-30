@@ -12,6 +12,8 @@ interface CryptoRateRepositoryInterface
 {
     public function save(CryptoRate $cryptoRate): void;
 
+    public function saveAll(CryptoRateCollection $rates): void;
+
     public function findLast24h(string $pair): CryptoRateCollection;
 
     public function findByDay(string $pair, DateTimeImmutable $date): CryptoRateCollection;

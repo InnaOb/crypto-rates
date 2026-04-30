@@ -10,7 +10,7 @@ use DateTimeImmutable;
 
 interface CryptoRateProviderInterface
 {
-    public function fetchAndSaveAll(): void;
+    public function fetchAll(): CryptoRateCollection;
 
     public function getLast24h(CurrencyPairEnum $pair): CryptoRateCollection;
 

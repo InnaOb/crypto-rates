@@ -8,6 +8,7 @@ use CryptoRate\DataLayer\Collection\CryptoRateCollection;
 use CryptoRate\DataLayer\Entity\CryptoRate;
 use CryptoRate\DataLayer\Http\Binance\BinanceHttpClientInterface;
 use CryptoRate\DataLayer\Repository\CryptoRateRepositoryInterface;
+use CryptoRate\FrameworkLayer\Exception\ServiceUnavailableCustomException;
 use CryptoRate\ServiceLayer\Provider\CryptoRate\CryptoRateProvider;
 use CryptoRate\Tool\Enum\Crypto\CurrencyPairEnum;
 use DateTimeImmutable;
@@ -51,7 +52,7 @@ final class CryptoRateProviderTest extends TestCase
         );
     }
 
-    public function testFetchAndSaveAllFetchesPriceForEachPairAndSaves(): void
+    public function testFetchAllReturnsCryptoRateCollectionForEachPair(): void
     {
         $pairs = CurrencyPairEnum::cases();
         $prices = ['62345.12000000', '3120.45000000', '74.89000000'];
@@ -61,31 +62,54 @@ final class CryptoRateProviderTest extends TestCase
             ->method('getPrice')
             ->willReturnOnConsecutiveCalls(...$prices);
 
-        $this->cryptoRateRepositoryMock
-            ->expects($this->exactly(count($pairs)))
-            ->method('save')
-            ->with($this->isInstanceOf(CryptoRate::class));
+        $result = $this->cryptoRateProvider->fetchAll();
 
-        $this->cryptoRateProvider->fetchAndSaveAll();
+        $this->assertInstanceOf(CryptoRateCollection::class, $result);
+        $this->assertCount(count($pairs), $result);
     }
 
-    public function testFetchAndSaveAllSavesCorrectPairKeys(): void
+    public function testFetchAllReturnsCorrectPairKeys(): void
     {
-        $savedPairs = [];
-
         $this->binanceHttpClientMock
             ->method('getPrice')
             ->willReturn('50000.00000000');
 
-        $this->cryptoRateRepositoryMock
-            ->method('save')
-            ->willReturnCallback(static function (CryptoRate $rate) use (&$savedPairs): void {
-                $savedPairs[] = $rate->getPair();
+        $result = $this->cryptoRateProvider->fetchAll();
+
+        $pairs = array_map(static fn (CryptoRate $rate) => $rate->getPair(), iterator_to_array($result));
+
+        $this->assertSame(['EUR/BTC', 'EUR/ETH', 'EUR/LTC'], $pairs);
+    }
+
+    public function testFetchAllSkipsFailingPairAndReturnsRest(): void
+    {
+        $pairs = CurrencyPairEnum::cases();
+
+        $this->binanceHttpClientMock
+            ->expects($this->exactly(count($pairs)))
+            ->method('getPrice')
+            ->willReturnCallback(static function (string $symbol): string {
+                if ($symbol === CurrencyPairEnum::EUR_ETH->toBinanceSymbol()) {
+                    throw new ServiceUnavailableCustomException('Binance timeout');
+                }
+
+                return '50000.00000000';
             });
 
-        $this->cryptoRateProvider->fetchAndSaveAll();
+        $result = $this->cryptoRateProvider->fetchAll();
 
-        $this->assertSame(['EUR/BTC', 'EUR/ETH', 'EUR/LTC'], $savedPairs);
+        $this->assertCount(count($pairs) - 1, $result);
+    }
+
+    public function testFetchAllReturnsEmptyCollectionWhenAllPricesFail(): void
+    {
+        $this->binanceHttpClientMock
+            ->method('getPrice')
+            ->willThrowException(new ServiceUnavailableCustomException('Binance unavailable'));
+
+        $result = $this->cryptoRateProvider->fetchAll();
+
+        $this->assertTrue($result->isEmpty());
     }
 
     /**

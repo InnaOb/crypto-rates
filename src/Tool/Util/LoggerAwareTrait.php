@@ -90,4 +90,19 @@ trait LoggerAwareTrait
             ]
         );
     }
+
+    protected function logError(\Throwable $e, ModuleContextEnum $moduleContext, array $context = []): void
+    {
+        $this->logger->error(
+            $e->getMessage(),
+            array_merge(
+                [
+                    ContextEnum::MODULE->value => $moduleContext->value,
+                    ContextEnum::CLASS_NAME->value => $this->getClassName(),
+                    ContextEnum::EXCEPTION->value => $e,
+                ],
+                $context,
+            )
+        );
+    }
 }

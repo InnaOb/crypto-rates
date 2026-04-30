@@ -23,6 +23,15 @@ class CryptoRateRepository extends ServiceEntityRepository implements CryptoRate
         $this->getEntityManager()->flush();
     }
 
+    public function saveAll(CryptoRateCollection $rates): void
+    {
+        foreach ($rates as $rate) {
+            $this->getEntityManager()->persist($rate);
+        }
+        $this->getEntityManager()->flush();
+        $this->getEntityManager()->clear();
+    }
+
     public function findLast24h(string $pair): CryptoRateCollection
     {
         return CryptoRateCollection::fromEntities(

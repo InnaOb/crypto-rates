@@ -29,6 +29,16 @@ final readonly class CryptoRateCollection implements IteratorAggregate, Countabl
         return new self($items);
     }
 
+    public static function empty(): self
+    {
+        return new self([]);
+    }
+
+    public function withAdded(CryptoRate $rate): self
+    {
+        return new self([...$this->items, $rate]);
+    }
+
     public function getIterator(): ArrayIterator
     {
         return new ArrayIterator($this->items);
@@ -42,6 +52,11 @@ final readonly class CryptoRateCollection implements IteratorAggregate, Countabl
     public function isEmpty(): bool
     {
         return $this->items === [];
+    }
+
+    public function isNotEmpty(): bool
+    {
+        return $this->items !== [];
     }
 
     public function map(callable $callback): array
