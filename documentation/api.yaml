@@ -116,12 +116,6 @@ components:
     RatesResponse:
       description: 'Success response with rate data'
       properties:
-        data:
-          nullable: true
-          oneOf:
-            -
-              $ref: '#/components/schemas/RatesData'
-          default: null
         status:
           description: 'Response status'
           type: string
@@ -129,6 +123,12 @@ components:
           default: success
           enum:
             - success
+        data:
+          nullable: true
+          oneOf:
+            -
+              $ref: '#/components/schemas/RatesData'
+          default: null
       type: object
     BaseErrorResponse:
       description: 'Error response'

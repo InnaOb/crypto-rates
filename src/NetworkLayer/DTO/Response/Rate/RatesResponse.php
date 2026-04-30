@@ -15,6 +15,6 @@ final class RatesResponse extends BaseSuccessResponse
         #[OA\Property(ref: new Model(type: RatesData::class))]
         RatesData $data,
     ) {
-        parent::__construct($data);
+        parent::__construct(data: $data);
     }
 }

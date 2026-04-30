@@ -10,10 +10,10 @@ use OpenApi\Attributes as OA;
 class BaseSuccessResponse implements BaseResponseInterface
 {
     public function __construct(
-        public readonly ?ResponseDataInterface $data = null,
-
         #[OA\Property(description: 'Response status', type: 'string', example: 'success', enum: ['success'])]
         public readonly ResponseStatusEnum $status = ResponseStatusEnum::SUCCESS,
+
+        public readonly ?ResponseDataInterface $data = null,
     ) {
     }
 }
