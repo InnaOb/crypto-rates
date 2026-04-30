@@ -1,0 +1,7 @@
+framework:
+    messenger:
+        transports:
+            sync: 'sync://'
+
+        routing:
+            CryptoRate\BusinessLogicLayer\Scheduler\FetchCryptoRatesMessage: sync
