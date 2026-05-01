@@ -1,0 +1,162 @@
+openapi: 3.0.0
+info:
+  title: 'Crypto Rates API'
+  description: 'API for cryptocurrency exchange rates (EUR to BTC, ETH, LTC) sourced from Binance'
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost:8080'
+    description: 'Local development'
+paths:
+  /api/rates/last-24h:
+    get:
+      tags:
+        - 'Crypto Rates'
+      summary: 'Get rates for the last 24 hours (every 5 minutes)'
+      operationId: get_api_rates_last_24h
+      parameters:
+        -
+          name: pair
+          in: query
+          description: 'Currency pair'
+          required: true
+          schema:
+            type: string
+            enum:
+              - EUR/BTC
+              - EUR/ETH
+              - EUR/LTC
+          example: EUR/BTC
+      responses:
+        '200':
+          description: 'List of rates for the last 24 hours'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatesResponse'
+        200-error:
+          description: 'Validation or service error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseErrorResponse'
+  /api/rates/day:
+    get:
+      tags:
+        - 'Crypto Rates'
+      summary: 'Get rates for a specific day (every 5 minutes)'
+      operationId: get_api_rates_day
+      parameters:
+        -
+          name: pair
+          in: query
+          description: 'Currency pair'
+          required: true
+          schema:
+            type: string
+            enum:
+              - EUR/BTC
+              - EUR/ETH
+              - EUR/LTC
+          example: EUR/BTC
+        -
+          name: date
+          in: query
+          description: 'Date in YYYY-MM-DD format'
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2026-04-30'
+      responses:
+        '200':
+          description: 'List of rates for the given day'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatesResponse'
+        200-error:
+          description: 'Validation or service error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseErrorResponse'
+components:
+  schemas:
+    RateItemResponse:
+      description: 'Single cryptocurrency rate entry'
+      required:
+        - pair
+        - rate
+        - recorded_at
+      properties:
+        pair:
+          description: 'Currency pair'
+          type: string
+          example: EUR/BTC
+        rate:
+          description: 'Exchange rate'
+          type: string
+          example: '62345.12000000'
+        recorded_at:
+          description: 'Timestamp when rate was recorded'
+          type: string
+          example: '2026-04-30T10:00:00+00:00'
+      type: object
+    RatesData:
+      description: 'Rate data payload'
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RateItemResponse'
+      type: object
+    RatesResponse:
+      description: 'Success response with rate data'
+      properties:
+        status:
+          description: 'Response status'
+          type: string
+          example: success
+          default: success
+          enum:
+            - success
+        data:
+          nullable: true
+          oneOf:
+            -
+              $ref: '#/components/schemas/RatesData'
+          default: null
+      type: object
+    BaseErrorResponse:
+      description: 'Error response'
+      properties:
+        status:
+          description: 'Response status'
+          type: string
+          example: error
+          default: error
+          enum:
+            - error
+        error_code:
+          description: 'Application error code'
+          type: string
+          example: cr_error_2
+          default: cr_error_1
+        message:
+          description: 'Error message'
+          type: string
+          example: 'Validation error.'
+          default: 'Unhandled error.'
+        details:
+          description: 'Error details'
+          type: string
+          example: 'pair: This value should not be blank.'
+          default: ''
+      type: object
+tags:
+  -
+    name: 'Crypto Rates'
+
